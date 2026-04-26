@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TRAVIS THE BARBER</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="https://res.cloudinary.com/dqqr9udcs/image/upload/v1776537729/JEROMECELEBRITYKUTTSLOGO_ykobkv.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://res.cloudinary.com/dqqr9udcs/image/upload/v1776537729/JEROMECELEBRITYKUTTSLOGO_ykobkv.png">
+  <link rel="shortcut icon" type="image/png" href="https://res.cloudinary.com/dqqr9udcs/image/upload/v1776537729/JEROMECELEBRITYKUTTSLOGO_ykobkv.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://res.cloudinary.com/dqqr9udcs/image/upload/v1776537729/JEROMECELEBRITYKUTTSLOGO_ykobkv.png">
+
+  <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #1a1a1a;
+      --accent: #C8192D;
+      --accent2: #8B0F1E;
+      --bg: #F5F0E8;
+      --white: #ffffff;
+    }
+
+    body {
+      font-family: 'Barlow', sans-serif;
+      background-color: #f0ece4;
+      margin: 0;
+      padding: 0;
+    }
+
+    .header-bar {
+      background-color: var(--primary);
+      padding: 12px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      color: var(--accent);
+      font-family: 'Bebas Neue', cursive;
+      letter-spacing: 3px;
+      border-bottom: 2px solid var(--accent);
+    }
+
+    .top-menu {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      background-color: #222;
+      padding: 10px;
+      gap: 8px;
+      border-bottom: 2px solid var(--accent);
+    }
+
+    .top-menu button {
+      background-color: #333;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      width: 100%;
+      font-family: 'Barlow', sans-serif;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      transition: all 0.2s;
+    }
+
+    .top-menu button:hover {
+      background-color: var(--accent);
+      color: var(--primary);
+    }
+
+    .admin-container {
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      border-top: 4px solid var(--accent);
+    }
+
+    h2 {
+      color: var(--primary);
+      text-align: center;
+      font-family: 'Bebas Neue', cursive;
+      letter-spacing: 2px;
+      font-size: 26px;
+    }
+
+    input[type="text"], input[type="date"], input[type="time"], select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 14px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-family: 'Barlow', sans-serif;
+      font-size: 14px;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    button {
+      background-color: var(--primary);
+      color: var(--accent);
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-bottom: 16px;
+      font-family: 'Barlow', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      transition: background 0.2s;
+    }
+
+    button:hover { background-color: var(--accent2); }
+
+    /* ---- Upload Area ---- */
+    .upload-area {
+      border: 2px dashed var(--accent);
+      border-radius: 10px;
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 16px;
+      cursor: pointer;
+      background: #faf7f0;
+      transition: background 0.2s;
+      position: relative;
+    }
+
+    .upload-area:hover { background: #f0e9d5; }
+
+    .upload-area input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
+
+    .upload-area .upload-icon {
+      font-size: 40px;
+      margin-bottom: 8px;
+    }
+
+    .upload-area p {
+      margin: 0;
+      font-size: 14px;
+      color: #666;
+      font-family: 'Barlow', sans-serif;
+    }
+
+    .upload-area strong { color: var(--accent2); }
+
+    #imagePreview {
+      max-width: 200px;
+      max-height: 200px;
+      border-radius: 8px;
+      margin: 10px auto;
+      display: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    #uploadProgress {
+      display: none;
+      margin-bottom: 12px;
+    }
+
+    #uploadProgress progress {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      accent-color: var(--accent);
+    }
+
+    /* ---- Gallery ---- */
+    .gallery-category { margin-top: 40px; }
+
+    .gallery-category h3 {
+      text-align: center;
+      margin-bottom: 15px;
+      font-size: 20px;
+      color: var(--primary);
+      text-transform: uppercase;
+      font-family: 'Bebas Neue', cursive;
+      letter-spacing: 2px;
+    }
+
+    .gallery-wrapper { max-width: 1000px; margin: 0 auto; padding: 0 10px; }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .gallery-grid div { position: relative; }
+
+    .gallery-grid img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: #e53935;
+      color: white;
+      border: none;
+      padding: 5px 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 0;
+    }
+
+    .remove-btn:hover { background-color: #c62828; }
+
+    /* ---- Table ---- */
+    table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: center; font-family: 'Barlow', sans-serif; font-size: 14px; }
+
+    th { background-color: var(--primary); color: var(--accent); font-weight: 700; letter-spacing: 0.5px; }
+
+    /* ---- Sections ---- */
+    .content-section { display: none; }
+    .content-section.active { display: block; }
+
+    .clear-container { display: flex; justify-content: center; margin-top: 20px; gap: 10px; flex-wrap: wrap; }
+    .clear-container input { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-family: 'Barlow', sans-serif; }
+
+    /* ---- Reservation Cards ---- */
+    .reservation-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 15px;
+      margin: 12px 0;
+      border-left: 4px solid var(--accent);
+    }
+
+    .reservation-header { display: flex; justify-content: space-between; align-items: center; }
+    .reservation-header h3 { margin: 0; color: var(--primary); font-family: 'Bebas Neue', cursive; letter-spacing: 1px; font-size: 20px; }
+
+    .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; color: #fff; }
+    .badge.today { background: #28a745; }
+    .badge.upcoming { background: #ff9800; }
+    .badge.tomorrow { background: #007bff; }
+    .badge.past { background: #9e9e9e; }
+
+    .reservation-group {
+      margin-top: 30px;
+      margin-bottom: 10px;
+      padding: 8px 14px;
+      background: var(--primary);
+      color: var(--accent);
+      border-radius: 6px;
+      font-size: 1.1rem;
+      text-align: center;
+      font-family: 'Bebas Neue', cursive;
+      letter-spacing: 2px;
+    }
+
+    .highlighted {
+      border: 3px solid #ff9800 !important;
+      box-shadow: 0 0 14px #ff9800 !important;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .reservation-card .action-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .cancel-btn {
+      flex: 1;
+      padding: 10px 12px;
+      font-weight: bold;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background-color: #e53935;
+      color: white;
+      margin-bottom: 0;
+      transition: background 0.2s;
+    }
+
+    .cancel-btn:hover { background-color: #c62828; }
+
+    .deposit-btn {
+      flex: 1;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-bottom: 0;
+      transition: background 0.2s;
+    }
+
+    .deposit-btn:hover { background-color: #388E3C; }
+
+    .status-btn {
+      flex: 1;
+      background-color: #1976D2;
+      color: white;
+      border: none;
+      padding: 10px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-bottom: 0;
+      transition: background 0.2s;
+    }
+
+    #unavailableDateInput, #startTimeInput, #endTimeInput {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 14px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-sizing: border-box;
+      font-family: 'Barlow', sans-serif;
+    }
+
+    .status-completed { color: green; font-weight: bold; }
+    .status-not { color: red; font-weight: bold; }
+    .status-none { color: gray; font-style: italic; }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #444;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      display: block;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ===== CHECKING ACCESS OVERLAY ===== -->
+  <div id="accessOverlay" style="
+    position:fixed;inset:0;z-index:99999;
+    background:#1a1a1a;
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    gap:24px;">
+    <div style="font-family:'Bebas Neue',cursive;font-size:42px;letter-spacing:6px;color:#C8192D;">CHECKING ACCESS</div>
+    <div style="display:flex;gap:10px;">
+      <span style="width:12px;height:12px;border-radius:50%;background:#C8192D;animation:dotpulse 1.2s ease-in-out infinite;display:inline-block;"></span>
+      <span style="width:12px;height:12px;border-radius:50%;background:#C8192D;animation:dotpulse 1.2s ease-in-out 0.4s infinite;display:inline-block;"></span>
+      <span style="width:12px;height:12px;border-radius:50%;background:#C8192D;animation:dotpulse 1.2s ease-in-out 0.8s infinite;display:inline-block;"></span>
+    </div>
+    <div id="accessStatus" style="font-family:'Barlow',sans-serif;font-size:14px;color:#888;letter-spacing:1px;">VERIFYING IDENTITY...</div>
+  </div>
+  <style>
+    @keyframes dotpulse {
+      0%,100%{opacity:0.2;transform:scale(0.8);}
+      50%{opacity:1;transform:scale(1.2);}
+    }
+    #dashboardContent{display:none;}
+  </style>
+
+  <div id="dashboardContent">
+  <div class="header-bar">TRAVIS THE BARBER ✂ — ADMIN</div>
+
+  <div class="top-menu">
+    <button onclick="showSection('gallerySection')">✂ GALLERY</button>
+    <button onclick="showSection('reservationsPage')">📋 RESERVATIONS</button>
+    <button onclick="showSection('unavailableDaysSection')">🚫 UNAVAILABLE DAYS</button>
+  </div>
+
+  <!-- Gallery Management -->
+  <div id="gallerySection" class="admin-container content-section">
+    <h2>📸 UPLOAD PHOTO</h2>
+
+    <!-- Device Upload Area -->
+    <div class="upload-area" id="uploadArea">
+      <input type="file" id="photoFileInput" accept="image/*" onchange="previewImage(event)"/>
+      <div class="upload-icon">📷</div>
+      <p><strong>Tap to choose a photo</strong><br>or drag and drop here</p>
+    </div>
+
+    <!-- Image Preview -->
+    <img id="imagePreview" alt="Preview"/>
+
+    <!-- Upload Progress -->
+    <div id="uploadProgress">
+      <p style="font-size:13px; color:#888; margin-bottom:4px;">Uploading...</p>
+      <progress id="progressBar" value="0" max="100"></progress>
+    </div>
+
+    <label for="photoCategorySelect">SELECT CATEGORY</label>
+    <select id="photoCategorySelect">
+      <option value="FADES">FADES</option>
+      <option value="KIDS CUT">KIDS CUT</option>
+      <option value="SPECIAL DESIGNS">SPECIAL DESIGNS</option>
+      <option value="ONE LEVEL">ONE LEVEL</option>
+      <option value="LADIES CUT">LADIES CUT</option>
+    </select>
+
+    <button onclick="uploadPhoto()" id="uploadBtn">ADD PHOTO</button>
+
+    <div id="adminGallery"></div>
+  </div>
+
+  <!-- Reservations Section -->
+  <div class="admin-container content-section" id="reservationsPage">
+    <h2>RESERVATIONS</h2>
+    <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
+      <input id="reservationSearch" placeholder="SEARCH RESERVATIONS..." type="text" style="flex:1; min-width:180px;"/>
+      <button onclick="searchReservations()" style="margin-bottom:0;">Search</button>
+    </div>
+    <div id="reservationsList"></div>
+    <div class="clear-container">
+      <input id="clearInput" placeholder='Type "CONFIRM" to clear past reservations' type="text"/>
+      <button onclick="clearReservations()">Clear Past Reservations</button>
+    </div>
+  </div>
+
+  <!-- Unavailable Days -->
+  <div class="admin-container content-section" id="unavailableDaysSection">
+    <h2>SET UNAVAILABLE DAYS</h2>
+    <label>Date:</label>
+    <input id="unavailableDateInput" type="date"/>
+    <label><input checked id="allDayCheckbox" onchange="toggleTimeInputs()" type="checkbox"/> All Day</label>
+    <div id="timeInputs" style="display:none; margin-top:10px;">
+      <label>FROM:</label>
+      <input id="startTimeInput" type="time"/>
+      <label>UNTIL:</label>
+      <input id="endTimeInput" type="time"/>
+    </div>
+    <button onclick="addUnavailableDate()">Add Unavailable Date</button>
+    <h3 style="font-family:'Bebas Neue',cursive; letter-spacing:1px; color:var(--primary);">Unavailable Dates</h3>
+    <ul id="unavailableDatesList" style="font-family:'Barlow',sans-serif; font-size:14px;"></ul>
+  </div>
+
+  <!-- Conflict Modal -->
+  <div id="conflictModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:2000;">
+    <div style="background:#fff; padding:20px; border-radius:12px; max-width:450px; width:90%; max-height:80%; overflow-y:auto; box-shadow:0 4px 10px rgba(0,0,0,0.2); border-top:4px solid #ff9800;">
+      <h3 style="margin-bottom:10px; color:#ff9800;">⚠️ Conflicting Bookings</h3>
+      <p style="font-size:14px; color:#333; margin-bottom:15px;">The following bookings conflict. Please <strong>contact the client</strong> and <strong>cancel the booking</strong> before marking this time as unavailable.</p>
+      <div id="conflictList"></div>
+      <div style="text-align:right; margin-top:15px;">
+        <button onclick="closeConflictModal()" style="background:var(--primary); color:var(--accent); border:none; padding:8px 14px; border-radius:6px; cursor:pointer; margin-bottom:0;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deposit Modal -->
+  <div id="depositModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
+    <div style="background:#fff; padding:24px; border-radius:12px; max-width:320px; width:90%; text-align:center; box-shadow:0 4px 10px rgba(0,0,0,0.2); border-top:4px solid var(--accent);">
+      <h3 style="margin-bottom:15px; font-family:'Bebas Neue',cursive; letter-spacing:1px; color:var(--primary);">UPDATE PAYMENT STATUS</h3>
+      <label style="display:block; text-align:left; margin:10px 0; font-weight:normal; text-transform:none; letter-spacing:0;">
+        <input type="radio" name="depositChoice" value="Made"> 💵 PAYMENT MADE
+      </label>
+      <label style="display:block; text-align:left; margin:10px 0; font-weight:normal; text-transform:none; letter-spacing:0;">
+        <input type="radio" name="depositChoice" value="No"> ❌ NO PAYMENT MADE
+      </label>
+      <div style="margin-top:20px; display:flex; gap:10px; justify-content:center;">
+        <button onclick="closeDepositModal()" style="background:#ccc; color:#333; border:none; padding:8px 16px; border-radius:6px; margin-bottom:0;">Cancel</button>
+        <button onclick="confirmDeposit()" style="background:#4CAF50; color:white; border:none; padding:8px 16px; border-radius:6px; margin-bottom:0;">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Modal -->
+  <div id="statusModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1100;">
+    <div style="background:#fff; padding:24px; border-radius:12px; max-width:320px; width:90%; text-align:center; box-shadow:0 4px 10px rgba(0,0,0,0.2); border-top:4px solid var(--accent);">
+      <h3 style="margin-bottom:15px; font-family:'Bebas Neue',cursive; letter-spacing:1px; color:var(--primary);">UPDATE BOOKING STATUS</h3>
+      <label style="display:block; text-align:left; margin:10px 0; font-weight:normal; text-transform:none; letter-spacing:0;">
+        <input type="radio" name="statusChoice" value="Completed"> ✅ Completed
+      </label>
+      <label style="display:block; text-align:left; margin:10px 0; font-weight:normal; text-transform:none; letter-spacing:0;">
+        <input type="radio" name="statusChoice" value="Not Completed"> ❌ Not Completed
+      </label>
+      <div style="margin-top:20px; display:flex; gap:10px; justify-content:center;">
+        <button onclick="closeStatusModal()" style="background:#ccc; color:#333; border:none; padding:8px 16px; border-radius:6px; margin-bottom:0;">Cancel</button>
+        <button onclick="confirmStatus()" style="background:var(--primary); color:var(--accent); border:none; padding:8px 16px; border-radius:6px; margin-bottom:0;">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" style="visibility:hidden; min-width:250px; margin-left:-125px; background-color:#4CAF50; color:#fff; text-align:center; border-radius:8px; padding:14px; position:fixed; z-index:3000; left:50%; bottom:30px; font-size:15px; box-shadow:0 4px 12px rgba(0,0,0,0.2); opacity:0; transition:opacity 0.5s, bottom 0.5s; font-family:'Barlow',sans-serif;"></div>
+
+  <script>
+ const firebaseConfig = {
+  apiKey: "AIzaSyB1nE1lIgafauY3i2zV7F0lFeOHiUYjeWM",
+  authDomain: "purge-cutz.firebaseapp.com",
+  projectId: "purge-cutz",
+  storageBucket: "purge-cutz.firebasestorage.app",
+  messagingSenderId: "915681565699",
+  appId: "1:915681565699:web:f4e49f54bdf6e090598236"
+};
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    // ========== SECTION TOGGLE ==========
+    function showSection(sectionId) {
+      document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+      document.getElementById(sectionId).classList.add('active');
+    }
+
+    function toggleTimeInputs() {
+      const isAllDay = document.getElementById('allDayCheckbox').checked;
+      document.getElementById('timeInputs').style.display = isAllDay ? 'none' : 'block';
+    }
+
+    // ========== DEVICE UPLOAD ==========
+    function previewImage(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const preview = document.getElementById('imagePreview');
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+
+      // Update upload area text
+      const uploadArea = document.getElementById('uploadArea');
+      uploadArea.querySelector('p').innerHTML = `<strong>${file.name}</strong><br><span style="color:#888;">Ready to upload</span>`;
+    }
+
+    function uploadPhoto() {
+      const fileInput = document.getElementById('photoFileInput');
+      const categorySelect = document.getElementById('photoCategorySelect');
+      const category = categorySelect.value.trim();
+      const file = fileInput.files[0];
+
+      if (!file) {
+        alert('Please select a photo from your device first.');
+        return;
+      }
+
+      if (!category) {
+        alert('Please select a category.');
+        return;
+      }
+
+      const uploadBtn = document.getElementById('uploadBtn');
+      uploadBtn.disabled = true;
+      uploadBtn.textContent = 'UPLOADING...';
+
+      const progressDiv = document.getElementById('uploadProgress');
+      const progressBar = document.getElementById('progressBar');
+      progressDiv.style.display = 'block';
+
+      // Create unique filename
+      const timestamp = Date.now();
+      const ext = file.name.split('.').pop();
+      const fileName = `gallery/${timestamp}_${Math.random().toString(36).substring(2)}.${ext}`;
+
+      const storageRef = storage.ref(fileName);
+      const uploadTask = storageRef.put(file);
+
+      uploadTask.on('state_changed',
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          progressBar.value = progress;
+        },
+        (error) => {
+          console.error("Upload error:", error);
+          alert('Upload failed: ' + error.message);
+          uploadBtn.disabled = false;
+          uploadBtn.textContent = 'ADD PHOTO';
+          progressDiv.style.display = 'none';
+        },
+        () => {
+          // Upload complete — get download URL
+          uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+            return db.collection('gallery').add({ url: downloadURL, category: category, sortOrder: Date.now(), uploadedAt: firebase.firestore.FieldValue.serverTimestamp() });
+          }).then(() => {
+            showToast('✅ Photo uploaded successfully!');
+            // Reset form
+            fileInput.value = '';
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('imagePreview').src = '';
+            progressDiv.style.display = 'none';
+            progressBar.value = 0;
+            uploadBtn.disabled = false;
+            uploadBtn.textContent = 'ADD PHOTO';
+            document.getElementById('uploadArea').querySelector('p').innerHTML = '<strong>Tap to choose a photo</strong><br>or drag and drop here';
+          }).catch((error) => {
+            console.error("Firestore error:", error);
+            alert('Error saving photo reference: ' + error.message);
+            uploadBtn.disabled = false;
+            uploadBtn.textContent = 'ADD PHOTO';
+            progressDiv.style.display = 'none';
+          });
+        }
+      );
+    }
+
+    // ========== GALLERY LOAD WITH DRAG-TO-REORDER ==========
+    function loadGallery() {
+      const galleryContainer = document.getElementById('adminGallery');
+      galleryContainer.innerHTML = '';
+
+      db.collection('gallery').orderBy('sortOrder', 'asc').onSnapshot((querySnapshot) => {
+        // If some docs lack sortOrder, fall back secondary sort by uploadedAt
+        let docs = [];
+        querySnapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
+        docs.sort((a, b) => {
+          if (a.sortOrder !== undefined && b.sortOrder !== undefined) return a.sortOrder - b.sortOrder;
+          if (a.sortOrder !== undefined) return -1;
+          if (b.sortOrder !== undefined) return 1;
+          return 0;
+        });
+
+        galleryContainer.innerHTML = '';
+        if (docs.length === 0) {
+          galleryContainer.innerHTML = '<p style="text-align:center;color:#888;margin-top:20px;">No photos in gallery yet.</p>';
+          return;
+        }
+
+        const categories = {};
+        docs.forEach(item => {
+          const category = item.category || 'Uncategorized';
+          if (!categories[category]) categories[category] = [];
+          categories[category].push({ imageUrl: item.url, docId: item.id, sortOrder: item.sortOrder });
+        });
+
+        for (const category in categories) {
+          const catId = `gallery-${category.replace(/\s+/g,'-')}`;
+          const catDiv = document.createElement('div');
+          catDiv.className = 'gallery-category';
+          catDiv.innerHTML = `
+            <h3>${category}</h3>
+            <p style="text-align:center; font-size:12px; color:#888; margin-top:-10px; margin-bottom:10px;">Hold &amp; drag photos to reorder</p>
+            <div class="gallery-wrapper">
+              <div class="gallery-grid" id="${catId}" data-category="${category}"></div>
+            </div>
+          `;
+          galleryContainer.appendChild(catDiv);
+
+          const grid = catDiv.querySelector(`#${catId}`);
+          categories[category].forEach((item, index) => {
+            const cell = document.createElement('div');
+            cell.draggable = true;
+            cell.dataset.docId = item.docId;
+            cell.style.position = 'relative';
+            cell.style.cursor = 'grab';
+            cell.style.userSelect = 'none';
+            cell.innerHTML = `
+              <img src="${item.imageUrl}" alt="Cut" style="width:100%;height:250px;object-fit:cover;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.12); pointer-events:none;">
+              <button class="remove-btn" onclick="removePhoto('${item.docId}')">✕ Remove</button>
+              <div style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.5);color:var(--accent);border-radius:4px;padding:3px 6px;font-size:11px;pointer-events:none;">⠿ DRAG</div>
+            `;
+            grid.appendChild(cell);
+          });
+
+          initDragReorder(grid);
+        }
+      });
+    }
+
+    // ========== DRAG & DROP REORDER ==========
+    function initDragReorder(grid) {
+      let dragSrc = null;
+
+      grid.addEventListener('dragstart', e => {
+        dragSrc = e.target.closest('[draggable]');
+        if (!dragSrc) return;
+        dragSrc.style.opacity = '0.4';
+        e.dataTransfer.effectAllowed = 'move';
+      });
+
+      grid.addEventListener('dragover', e => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        const target = e.target.closest('[draggable]');
+        if (target && target !== dragSrc) {
+          const rect = target.getBoundingClientRect();
+          const after = e.clientX > rect.left + rect.width / 2;
+          if (after) {
+            grid.insertBefore(dragSrc, target.nextSibling);
+          } else {
+            grid.insertBefore(dragSrc, target);
+          }
+        }
+      });
+
+      grid.addEventListener('dragend', e => {
+        if (dragSrc) dragSrc.style.opacity = '';
+        dragSrc = null;
+
+        // Save new order to Firestore
+        const cells = Array.from(grid.querySelectorAll('[draggable]'));
+        const batch = db.batch();
+        cells.forEach((cell, index) => {
+          const docId = cell.dataset.docId;
+          if (docId) {
+            batch.update(db.collection('gallery').doc(docId), { sortOrder: index });
+          }
+        });
+        batch.commit()
+          .then(() => showToast('✅ Photo order saved.'))
+          .catch(err => showToast('❌ Failed to save order.', false));
+      });
+
+      // Touch support (long-press drag)
+      let touchDragEl = null, touchClone = null, touchOffsetX = 0, touchOffsetY = 0, longPressTimer = null;
+
+      grid.addEventListener('touchstart', e => {
+        const cell = e.target.closest('[draggable]');
+        if (!cell) return;
+        longPressTimer = setTimeout(() => {
+          touchDragEl = cell;
+          const rect = cell.getBoundingClientRect();
+          touchOffsetX = e.touches[0].clientX - rect.left;
+          touchOffsetY = e.touches[0].clientY - rect.top;
+          touchClone = cell.cloneNode(true);
+          touchClone.style.cssText = `position:fixed;top:${rect.top}px;left:${rect.left}px;width:${rect.width}px;opacity:0.7;z-index:9999;pointer-events:none;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.4);transition:none;`;
+          document.body.appendChild(touchClone);
+          cell.style.opacity = '0.3';
+          navigator.vibrate && navigator.vibrate(50);
+        }, 400);
+      }, { passive: true });
+
+      grid.addEventListener('touchmove', e => {
+        if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+        if (!touchDragEl) return;
+        e.preventDefault();
+        const touch = e.touches[0];
+        touchClone.style.top = (touch.clientY - touchOffsetY) + 'px';
+        touchClone.style.left = (touch.clientX - touchOffsetX) + 'px';
+        // Find element underneath
+        touchClone.style.display = 'none';
+        const el = document.elementFromPoint(touch.clientX, touch.clientY);
+        touchClone.style.display = '';
+        const target = el && el.closest('[draggable]');
+        if (target && target !== touchDragEl && target.parentElement === grid) {
+          const rect = target.getBoundingClientRect();
+          const after = touch.clientX > rect.left + rect.width / 2;
+          if (after) grid.insertBefore(touchDragEl, target.nextSibling);
+          else grid.insertBefore(touchDragEl, target);
+        }
+      }, { passive: false });
+
+      const endTouch = () => {
+        if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+        if (!touchDragEl) return;
+        touchDragEl.style.opacity = '';
+        touchClone && touchClone.remove();
+        touchClone = null;
+        // Save order
+        const cells = Array.from(grid.querySelectorAll('[draggable]'));
+        const batch = db.batch();
+        cells.forEach((cell, index) => {
+          const docId = cell.dataset.docId;
+          if (docId) batch.update(db.collection('gallery').doc(docId), { sortOrder: index });
+        });
+        batch.commit()
+          .then(() => showToast('✅ Photo order saved.'))
+          .catch(() => showToast('❌ Failed to save order.', false));
+        touchDragEl = null;
+      };
+
+      grid.addEventListener('touchend', endTouch, { passive: true });
+      grid.addEventListener('touchcancel', endTouch, { passive: true });
+    }
+
+    function removePhoto(docId) {
+      if (!confirm("Remove this photo?")) return;
+      db.collection('gallery').doc(docId).delete()
+        .then(() => showToast('🗑 Photo removed.'))
+        .catch((error) => alert('Error removing photo: ' + error.message));
+    }
+
+    // ========== RESERVATIONS ==========
+    function loadReservations() {
+      const reservationsContainer = document.getElementById('reservationsList');
+      db.collection('bookings').orderBy("date", "asc").onSnapshot(snapshot => {
+        reservationsContainer.innerHTML = '';
+
+        if (snapshot.empty) {
+          reservationsContainer.innerHTML = "<p style='color:#888;text-align:center;'>No reservations found.</p>";
+          return;
+        }
+
+        const now = new Date();
+        const todayY = now.getFullYear(), todayM = now.getMonth(), todayD = now.getDate();
+        const tomorrow = new Date(now);
+        tomorrow.setDate(todayD + 1);
+
+        const todayList = [], tomorrowList = [], upcomingList = [], pastList = [];
+
+        snapshot.forEach(doc => {
+          const booking = doc.data();
+          if (typeof booking.date !== "string") return;
+
+          const [y, m, d] = booking.date.split('-').map(Number);
+          const bDate = new Date(y, m - 1, d);
+          const bY = bDate.getFullYear(), bM = bDate.getMonth(), bD = bDate.getDate();
+
+          const formattedDate = bDate.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+          const bookingWithSort = { id: doc.id, ...booking, date: formattedDate, timeSort: convertTimeToMinutes(booking.time) };
+
+          if (bY === todayY && bM === todayM && bD === todayD) todayList.push(bookingWithSort);
+          else if (bY === tomorrow.getFullYear() && bM === tomorrow.getMonth() && bD === tomorrow.getDate()) tomorrowList.push(bookingWithSort);
+          else if (bDate > tomorrow) upcomingList.push(bookingWithSort);
+          else if (bDate < new Date(todayY, todayM, todayD)) pastList.push(bookingWithSort);
+        });
+
+        const sortByTime = (a, b) => a.timeSort - b.timeSort;
+        todayList.sort(sortByTime); tomorrowList.sort(sortByTime);
+        upcomingList.sort(sortByTime); pastList.sort(sortByTime);
+
+        function renderGroup(title, list, badgeClass) {
+          if (!list.length) return;
+          reservationsContainer.innerHTML += `<div class="reservation-group">${title}</div>`;
+          list.forEach(booking => {
+            const isCancelled = booking.status === 'Cancelled';
+            reservationsContainer.innerHTML += `
+              <div class="reservation-card" data-id="${booking.id}" style="${isCancelled ? 'opacity:0.7; border-left:4px solid #e53935;' : ''}">
+                <div class="reservation-header">
+                  <h3>${booking.name}</h3>
+                  <div style="display:flex; gap:6px; align-items:center;">
+                    ${isCancelled ? `<span class="badge" style="background:#e53935;">CANCELLED BY ${(booking.cancelledBy === 'client' ? 'CLIENT' : 'ADMIN')}</span>` : `<span class="badge ${badgeClass}">${title}</span>`}
+                  </div>
+                </div>
+                <p style="font-size:14px; margin:4px 0;"><strong>Booking #:</strong> ${booking.bookingNumber || "N/A"}</p>
+                <p style="font-size:14px; margin:4px 0;"><strong>Phone:</strong> ${booking.phone}</p>
+                <p style="font-size:14px; margin:4px 0;"><strong>Date:</strong> ${booking.date}</p>
+                <p style="font-size:14px; margin:4px 0;"><strong>Time:</strong> ${booking.time}</p>
+                <p style="font-size:14px; margin:4px 0;"><strong>Service:</strong> ${booking.service}</p>
+                ${booking.total ? `<p style="font-size:14px; margin:4px 0;"><strong>💰 Total Cost:</strong> <span style="color:#1a7a1a; font-weight:700; font-size:15px;">$${Number(booking.total).toLocaleString()}</span></p>` : ''}
+                <p style="font-size:14px; margin:4px 0;"><strong>💵 Payment:</strong> ${booking.deposit || "No"}</p>
+                <p style="font-size:14px; margin:4px 0;"><strong>Status:</strong>
+                  <span class="${booking.status === 'Completed' ? 'status-completed' : booking.status === 'Cancelled' ? 'status-not' : booking.status === 'Not Completed' ? 'status-not' : 'status-none'}">
+                    ${booking.status || "Not Set"}${booking.status === 'Cancelled' ? ` — <strong>CANCELLED BY ${(booking.cancelledBy === 'client' ? 'CLIENT' : 'ADMIN')}</strong>` : ''}
+                  </span>
+                </p>
+                <div class="action-buttons">
+                  ${!isCancelled
+                    ? `<button class="cancel-btn" onclick="cancelReservation('${booking.id}')">✕ Cancel</button>`
+                    : `<button class="cancel-btn" disabled style="opacity:0.4; cursor:not-allowed;">✕ Cancelled</button>`
+                  }
+                  <button class="deposit-btn" onclick="updateDeposit('${booking.id}')">Payment</button>
+                  ${title === "Today" && !isCancelled ? `<button class="status-btn" onclick="updateStatus('${booking.id}')">Status</button>` : ""}
+                </div>
+              </div>
+            `;
+          });
+        }
+
+        renderGroup("Today", todayList, "today");
+        renderGroup("Tomorrow", tomorrowList, "tomorrow");
+        renderGroup("Upcoming", upcomingList, "upcoming");
+        renderGroup("Past", pastList, "past");
+      });
+    }
+
+    function convertTimeToMinutes(timeStr) {
+      if (!timeStr) return 0;
+      const timeParts = timeStr.trim().split(' ');
+      if (timeParts.length !== 2) return 0;
+      const [time, period] = timeParts;
+      const [hours, minutes] = time.split(':').map(Number);
+      if (isNaN(hours) || isNaN(minutes)) return 0;
+      let totalMinutes = (hours * 60) + minutes;
+      if (period.toUpperCase() === 'PM' && hours !== 12) totalMinutes += (12 * 60);
+      if (period.toUpperCase() === 'AM' && hours === 12) totalMinutes -= (12 * 60);
+      return totalMinutes;
+    }
+
+    function searchReservations() {
+      const query = document.getElementById("reservationSearch").value.toLowerCase();
+      document.querySelectorAll(".highlighted").forEach(el => el.classList.remove("highlighted"));
+      if (!query) return;
+
+      const cards = document.querySelectorAll(".reservation-card");
+      for (let card of cards) {
+        if (card.innerText.toLowerCase().includes(query)) {
+          card.classList.add("highlighted");
+          card.scrollIntoView({ behavior: "smooth", block: "center" });
+          break;
+        }
+      }
+    }
+
+    function clearReservations() {
+      const confirmInput = document.getElementById('clearInput').value.trim();
+      if (confirmInput !== 'CONFIRM') { alert('TYPE "CONFIRM" TO CLEAR PAST RESERVATIONS.'); return; }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      db.collection('bookings').get().then(snapshot => {
+        const batch = db.batch();
+        snapshot.forEach(doc => {
+          const booking = doc.data();
+          if (booking.date && typeof booking.date === "string") {
+            const [year, month, day] = booking.date.split('-').map(Number);
+            const bookingDate = new Date(year, month - 1, day);
+            bookingDate.setHours(0, 0, 0, 0);
+            if (bookingDate < today) batch.delete(doc.ref);
+          }
+        });
+        return batch.commit();
+      }).then(() => {
+        showToast('✅ Past reservations cleared.');
+        document.getElementById('clearInput').value = '';
+      }).catch(err => {
+        console.error(err);
+        alert("Failed to clear past reservations.");
+      });
+    }
+
+    function cancelReservation(orderId) {
+      document.getElementById('adminCancelBookingId').value = orderId;
+      document.getElementById('adminCancelModal').style.display = 'flex';
+    }
+
+    function confirmAdminCancel() {
+      const orderId = document.getElementById('adminCancelBookingId').value;
+      if (!orderId) return;
+      db.collection("bookings").doc(orderId).update({ status: 'Cancelled', cancelledBy: 'admin' })
+        .then(() => { closeAdminCancelModal(); showToast('🗑 Booking cancelled.'); })
+        .catch(err => { closeAdminCancelModal(); alert("Failed to cancel: " + err.message); });
+    }
+
+    function closeAdminCancelModal() {
+      document.getElementById('adminCancelModal').style.display = 'none';
+      document.getElementById('adminCancelBookingId').value = '';
+    }
+
+    // ========== DEPOSIT ==========
+    let currentBookingId = null;
+
+    function updateDeposit(bookingId) {
+      currentBookingId = bookingId;
+      document.querySelectorAll('input[name="depositChoice"]').forEach(r => r.checked = false);
+      document.getElementById('depositModal').style.display = 'flex';
+    }
+
+    function confirmDeposit() {
+      const choice = document.querySelector('input[name="depositChoice"]:checked');
+      if (!choice) { showToast("⚠️ Please select an option.", false); return; }
+
+      db.collection('bookings').doc(currentBookingId).update({ deposit: choice.value })
+        .then(() => { closeDepositModal(); showToast(`✅ Payment status: ${choice.value}`); })
+        .catch(error => showToast("❌ Failed to update payment.", false));
+    }
+
+    function closeDepositModal() {
+      document.getElementById('depositModal').style.display = 'none';
+      currentBookingId = null;
+    }
+
+    // ========== STATUS ==========
+    let currentStatusBookingId = null;
+
+    function updateStatus(bookingId) {
+      currentStatusBookingId = bookingId;
+      document.querySelectorAll('input[name="statusChoice"]').forEach(r => r.checked = false);
+      document.getElementById('statusModal').style.display = 'flex';
+    }
+
+    function confirmStatus() {
+      const choice = document.querySelector('input[name="statusChoice"]:checked');
+      if (!choice) { alert("Please select an option."); return; }
+
+      db.collection('bookings').doc(currentStatusBookingId).update({ status: choice.value })
+        .then(() => { closeStatusModal(); loadReservations(); })
+        .catch(error => alert("Failed to update status."));
+    }
+
+    function closeStatusModal() {
+      document.getElementById('statusModal').style.display = 'none';
+      currentStatusBookingId = null;
+    }
+
+    // ========== UNAVAILABLE DAYS ==========
+    async function addUnavailableDate() {
+      const date = document.getElementById('unavailableDateInput').value;
+      const allDay = document.getElementById('allDayCheckbox').checked;
+      const startTime = document.getElementById('startTimeInput').value;
+      const endTime = document.getElementById('endTimeInput').value;
+
+      if (!date) { alert("Please select a date."); return; }
+      if (!allDay && (!startTime || !endTime)) { alert("Please provide both start and end time."); return; }
+
+      const [yyyy, mm, dd] = date.split("-");
+      const finalDate = `${yyyy}-${mm}-${dd}`;
+
+      try {
+        const snapshot = await db.collection("bookings").where("date", "==", finalDate).get();
+        const conflicts = [];
+
+        if (!snapshot.empty) {
+          snapshot.forEach(doc => {
+            const booking = doc.data();
+            const bookingTime = booking.time || null;
+
+            if (allDay) {
+              conflicts.push({ id: doc.id, ...booking });
+            } else if (bookingTime) {
+              const bookingMinutes = convertTimeToMinutes(bookingTime);
+              const startMinutes = convertTimeToMinutes(startTime);
+              const endMinutes = convertTimeToMinutes(endTime);
+              if (bookingMinutes >= startMinutes && bookingMinutes <= endMinutes) conflicts.push({ id: doc.id, ...booking });
+            }
+          });
+        }
+
+        if (conflicts.length > 0) { showConflictModal(conflicts); return; }
+
+        await db.collection("unavailableDays").add({
+          date: finalDate, allDay,
+          startTime: allDay ? null : startTime,
+          endTime: allDay ? null : endTime,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        document.getElementById('unavailableDateInput').value = '';
+        document.getElementById('startTimeInput').value = '';
+        document.getElementById('endTimeInput').value = '';
+        document.getElementById('allDayCheckbox').checked = true;
+        document.getElementById('timeInputs').style.display = 'none';
+
+        showToast('✅ Unavailable day added.');
+      } catch (error) {
+        console.error(error);
+        alert("Failed to add unavailable day.");
+      }
+    }
+
+    function loadUnavailableDates() {
+      const list = document.getElementById('unavailableDatesList');
+      db.collection('unavailableDays').orderBy('date').onSnapshot(snapshot => {
+        list.innerHTML = '';
+        snapshot.forEach(doc => {
+          const d = doc.data();
+          let formattedDate = d.date;
+          if (d.date && d.date.includes("-")) {
+            const [yyyy, mm, dd] = d.date.split("-");
+            formattedDate = new Date(yyyy, mm - 1, dd).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+          }
+          let text = `${formattedDate} — ${d.allDay ? 'All Day' : `${d.startTime} to ${d.endTime}`}`;
+          list.innerHTML += `<li style="margin-bottom:8px;">${text} <button onclick="removeUnavailableDate('${doc.id}')" style="background:#e53935; color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:12px; margin-bottom:0;">Remove</button></li>`;
+        });
+      });
+    }
+
+    function removeUnavailableDate(id) { db.collection('unavailableDays').doc(id).delete(); }
+
+    // ========== CONFLICT MODAL ==========
+    function showConflictModal(conflicts) {
+      const conflictList = document.getElementById('conflictList');
+      conflictList.innerHTML = '';
+      conflicts.forEach(booking => {
+        conflictList.innerHTML += `
+          <div style="padding:12px; margin-bottom:12px; border:1px solid #ddd; border-radius:8px; background:#fafafa;">
+            <p style="margin:4px 0;font-size:14px;"><strong>Name:</strong> ${booking.name || "N/A"}</p>
+            <p style="margin:4px 0;font-size:14px;"><strong>Phone:</strong> ${booking.phone || "N/A"}</p>
+            <p style="margin:4px 0;font-size:14px;"><strong>Service:</strong> ${booking.service || "N/A"}</p>
+            <p style="margin:4px 0;font-size:14px;"><strong>Date:</strong> ${booking.date}</p>
+            <p style="margin:4px 0;font-size:14px;"><strong>Time:</strong> ${booking.time || "N/A"}</p>
+            <button onclick="goToReservationsAndHighlight('${booking.id}')" style="margin-top:8px; background:var(--accent); color:var(--primary); border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:bold; margin-bottom:0;">Go to Reservations</button>
+          </div>
+        `;
+      });
+      document.getElementById('conflictModal').style.display = 'flex';
+    }
+
+    function goToReservationsAndHighlight(bookingId) {
+      closeConflictModal();
+      showSection('reservationsPage');
+      setTimeout(() => {
+        const targetCard = document.querySelector(`[data-id="${bookingId}"]`);
+        if (targetCard) {
+          document.querySelectorAll(".highlighted").forEach(el => el.classList.remove("highlighted"));
+          targetCard.classList.add("highlighted");
+          targetCard.scrollIntoView({ behavior: "smooth", block: "center" });
+          setTimeout(() => targetCard.classList.remove("highlighted"), 6000);
+        }
+      }, 500);
+    }
+
+    function closeConflictModal() {
+      document.getElementById('conflictModal').style.display = 'none';
+    }
+
+    // ========== TOAST ==========
+    function showToast(message, success = true) {
+      const toast = document.getElementById("toast");
+      toast.innerText = message;
+      toast.style.backgroundColor = success ? "#4CAF50" : "#e53935";
+      toast.style.visibility = "visible";
+      toast.style.opacity = "1";
+      toast.style.bottom = "50px";
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.bottom = "30px";
+        setTimeout(() => { toast.style.visibility = "hidden"; }, 500);
+      }, 3000);
+    }
+
+    // ========== ADMIN UID GUARD ==========
+    const ADMIN_UID = "gXItXsQ7OpY2jqvfJMwxZIg0ntx1";
+
+    // ========== AUTH GUARD WITH OVERLAY ==========
+    firebase.auth().onAuthStateChanged(user => {
+      const overlay = document.getElementById('accessOverlay');
+      const status  = document.getElementById('accessStatus');
+      const content = document.getElementById('dashboardContent');
+
+      if (!user) {
+        status.textContent = 'ACCESS DENIED — REDIRECTING...';
+        status.style.color = '#e53935';
+        setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+        return;
+      }
+
+      if (user.uid !== ADMIN_UID) {
+        status.textContent = 'UNAUTHORISED — SIGNING OUT...';
+        status.style.color = '#e53935';
+        firebase.auth().signOut().then(() => {
+          setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+        });
+        return;
+      }
+
+      // Verified admin — reveal dashboard
+      status.textContent = 'ACCESS GRANTED';
+      status.style.color = '#4CAF50';
+      setTimeout(() => {
+        overlay.style.transition = 'opacity 0.4s';
+        overlay.style.opacity = '0';
+        setTimeout(() => {
+          overlay.style.display = 'none';
+          content.style.display = 'block';
+        }, 400);
+      }, 600);
+
+      loadGallery();
+      showSection('reservationsPage');
+      loadReservations();
+      loadUnavailableDates();
+    });
+  </script>
+  <!-- Admin Cancel Booking Modal -->
+  <div id="adminCancelModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); justify-content:center; align-items:center; z-index:2000;">
+    <div style="background:#fff; padding:28px 24px; border-radius:14px; max-width:320px; width:90%; text-align:center; box-shadow:0 8px 30px rgba(0,0,0,0.25); border-top:4px solid #e53935;">
+      <input type="hidden" id="adminCancelBookingId"/>
+      <div style="font-size:40px; margin-bottom:10px;">⚠️</div>
+      <h3 style="margin:0 0 8px; font-family:'Bebas Neue',cursive; letter-spacing:2px; color:#1a1a1a; font-size:22px;">CANCEL BOOKING?</h3>
+      <p style="font-size:14px; color:#666; margin:0 0 22px; font-family:'Barlow',sans-serif; line-height:1.5;">This will mark the booking as <strong style="color:#e53935;">Cancelled</strong>. The client will still appear in the list with a cancelled status.</p>
+      <div style="display:flex; gap:10px; justify-content:center;">
+        <button onclick="closeAdminCancelModal()" style="flex:1; background:#eee; color:#333; border:none; padding:11px 16px; border-radius:6px; cursor:pointer; font-family:'Barlow',sans-serif; font-weight:700; margin-bottom:0; font-size:14px;">Keep</button>
+        <button onclick="confirmAdminCancel()" style="flex:1; background:#e53935; color:white; border:none; padding:11px 16px; border-radius:6px; cursor:pointer; font-family:'Barlow',sans-serif; font-weight:700; margin-bottom:0; font-size:14px;">Yes, Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- end #dashboardContent -->
+</body>
+</html>
